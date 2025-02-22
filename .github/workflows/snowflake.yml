@@ -33,6 +33,7 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
+          export PATH="$HOME/bin:$PATH"
           snowsql -a $SNOWFLAKE_ACCOUNT \
                   -u $SNOWFLAKE_USER \
                   -P $SNOWFLAKE_PASSWORD \
