@@ -1,7 +1,14 @@
+name: Deploy to Snowflake
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    container: ghcr.io/snowflakedb/snowflake-snowsql:latest
+    container: ghcr.io/snowflakedb/snowflake-snowsql:latest  # Use the official SnowSQL container
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
