@@ -1,0 +1,30 @@
+name: Deploy to Snowflake
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install SnowSQL
+        run: |
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.24-linux_x86_64.bash
+          bash snowsql-1.2.24-linux_x86_64.bash
+
+      - name: Run Snowflake Query
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+        run: |
+          ./snowsql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -P $SNOWFLAKE_PASSWORD -d $SNOWFLAKE_DATABASE -s $SNOWFLAKE_SCHEMA -w $SNOWFLAKE_WAREHOUSE -q "SELECT CURRENT_VERSION();"
