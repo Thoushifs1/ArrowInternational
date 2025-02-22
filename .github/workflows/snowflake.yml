@@ -14,15 +14,14 @@ jobs:
 
       - name: Install SnowSQL
         run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/snowsql-linux_x86_64.bash
-          chmod +x snowsql-linux_x86_64.bash
-          ./snowsql-linux_x86_64.bash -y
-          echo 'export PATH=$HOME/bin:$PATH' >> $GITHUB_ENV
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.9-linux_x86_64.bash
+          chmod +x snowsql-1.2.9-linux_x86_64.bash
+          SNOWSQL_DEST=~/snowflake SNOWSQL_LOGIN_SHELL=~/.profile bash snowsql-1.2.9-linux_x86_64.bash
+          echo 'export PATH=$HOME/snowflake/bin:$PATH' >> $GITHUB_ENV
 
       - name: Verify SnowSQL Installation
         run: |
+          source ~/.profile
           snowsql --version
           which snowsql
 
@@ -53,3 +52,20 @@ jobs:
                   -s $SNOWFLAKE_SCHEMA \
                   -w $SNOWFLAKE_WAREHOUSE \
                   -q "SELECT CURRENT_VERSION();"
+
+      - name: Execute SQL Script
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+        run: |
+          snowsql -a $SNOWFLAKE_ACCOUNT \
+                  -u $SNOWFLAKE_USER \
+                  -P $SNOWFLAKE_PASSWORD \
+                  -d $SNOWFLAKE_DATABASE \
+                  -s $SNOWFLAKE_SCHEMA \
+                  -w $SNOWFLAKE_WAREHOUSE \
+                  -f code.sql
