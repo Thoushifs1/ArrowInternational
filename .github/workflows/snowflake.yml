@@ -25,12 +25,6 @@ jobs:
           snowsql --version
           which snowsql
 
-        run: |
-          snowsql -a $SNOWFLAKE_ACCOUNT \
-                  -u $SNOWFLAKE_USER \
-                  -P $SNOWFLAKE_PASSWORD \
-                  -q "SELECT CURRENT_USER();"
-
       - name: Run Snowflake Query
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
