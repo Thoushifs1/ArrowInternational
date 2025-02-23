@@ -14,99 +14,29 @@ jobs:
 
       - name: Install SnowSQL
         run: |
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-linux_x86_64
-          chmod +x snowsql-linux_x86_64
-          sudo mv snowsql-linux_x86_64 /usr/local/bin/snowsql
-          sudo chmod +x /usr/local/bin/snowsql
-          echo "export PATH=\$PATH:/usr/local/bin" >> ~/.bashrc
-          echo "SnowSQL installed successfully"
-
-      - name: Verify SnowSQL Installation
-        run: |
-          source ~/.bashrc
-          export PATH=$PATH:/usr/local/bin
-          which snowsql
-          snowsql --version
-
-      - name: Run Snowflake Query
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-        run: |
-          export PATH=$PATH:/usr/local/bin
-          snowsql -a $SNOWFLAKE_ACCOUNT \
-                  -u $SNOWFLAKE_USER \
-                  -P $SNOWFLAKE_PASSWORD \
-                  -d $SNOWFLAKE_DATABASE \
-                  -s $SNOWFLAKE_SCHEMA \
-                  -w $SNOWFLAKE_WAREHOUSE \
-                  -q "SELECT CURRENT_VERSION();"
-
-      - name: Execute SQL Script
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-        run: |
-          export PATH=$PATH:/usr/local/bin
-          snowsql -a $SNOWFLAKE_ACCOUNT \
-                  -u $SNOWFLAKE_USER \
-                  -P $SNOWFLAKE_PASSWORD \
-                  -d $SNOWFLAKE_DATABASE \
-                  -s $SNOWFLAKE_SCHEMA \
-                  -w $SNOWFLAKE_WAREHOUSE \
-                  -f code.sql
-name: Deploy to Snowflake
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Install SnowSQL
-        run: |
+          sudo apt update
+          sudo apt install -y unzip
           curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-linux_x86_64
           chmod +x snowsql-linux_x86_64
           sudo mv snowsql-linux_x86_64 /usr/local/bin/snowsql
           sudo chmod +x /usr/local/bin/snowsql
           echo "/usr/local/bin" >> $GITHUB_PATH
 
-      - name: Debug SnowSQL Installation
+      - name: Verify SnowSQL Installation
         run: |
           ls -lah /usr/local/bin/snowsql
           file /usr/local/bin/snowsql
           which snowsql
           snowsql --version
 
-      - name: Debug Snowflake Secrets
-        run: |
-          echo "SNOWFLAKE_ACCOUNT: $SNOWFLAKE_ACCOUNT"
-          echo "SNOWFLAKE_USER: $SNOWFLAKE_USER"
-          echo "SNOWFLAKE_DATABASE: $SNOWFLAKE_DATABASE"
-          echo "SNOWFLAKE_SCHEMA: $SNOWFLAKE_SCHEMA"
-          echo "SNOWFLAKE_WAREHOUSE: $SNOWFLAKE_WAREHOUSE"
+      - name: Test Snowflake Connection
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-
-      - name: Test Snowflake Connection
         run: |
           snowsql -a $SNOWFLAKE_ACCOUNT \
                   -u $SNOWFLAKE_USER \
@@ -115,6 +45,8 @@ jobs:
                   -s $SNOWFLAKE_SCHEMA \
                   -w $SNOWFLAKE_WAREHOUSE \
                   -q "SELECT 1;"
+
+      - name: Execute SQL Script
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
@@ -122,8 +54,6 @@ jobs:
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-
-      - name: Execute SQL Script
         run: |
           snowsql -a $SNOWFLAKE_ACCOUNT \
                   -u $SNOWFLAKE_USER \
@@ -132,10 +62,3 @@ jobs:
                   -s $SNOWFLAKE_SCHEMA \
                   -w $SNOWFLAKE_WAREHOUSE \
                   -f code.sql
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
