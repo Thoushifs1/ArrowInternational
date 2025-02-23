@@ -12,6 +12,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Verify Files
+        run: |
+          echo "Listing files in installers directory:"
+          ls -lah installers
+
       - name: Install SnowSQL
         run: |
           sudo apt update
