@@ -12,23 +12,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install SnowSQL
+      - name: Install SnowSQL from Snowflake Repository
         run: |
           sudo apt update
-          sudo apt install -y unzip wget
-          
-          # Download SnowSQL using authenticated request
-          wget --content-disposition "https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.23-linux_x86_64.bash"
-
-          # Install SnowSQL
+          sudo apt install -y unzip curl
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.23-linux_x86_64.bash
           chmod +x snowsql-1.2.23-linux_x86_64.bash
-          ./snowsql-1.2.23-linux_x86_64.bash --quiet -- -y
-
-          # Ensure SnowSQL is in PATH
-          echo "/usr/bin" >> $GITHUB_PATH
-          echo "export PATH=\$PATH:/usr/bin" >> ~/.bashrc
+          ./snowsql-1.2.23-linux_x86_64.bash -- -y
+          echo "export PATH=$PATH:/usr/bin" >> ~/.bashrc
           source ~/.bashrc
-          which snowsql
           snowsql --version
 
       - name: Test Snowflake Connection
