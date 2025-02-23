@@ -14,14 +14,8 @@ jobs:
 
       - name: Verify Files
         run: |
-          echo "Checking if installers directory exists..."
-          if [ -d "installers" ]; then
-              echo "Listing files in installers directory:"
-              ls -lah installers
-          else
-              echo "Error: 'installers' directory does not exist!"
-              exit 1
-          fi
+          echo "Listing files in installers directory:"
+          ls -lah installers
 
       - name: Install SnowSQL
         run: |
