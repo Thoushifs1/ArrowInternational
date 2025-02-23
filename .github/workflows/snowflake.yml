@@ -1,4 +1,4 @@
-name: Deploy to Snowflake
+name: Debug SnowSQL Installation
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -14,68 +14,22 @@ jobs:
 
       - name: Verify Files
         run: |
+          echo "Checking if installers directory exists..."
+          if [ -d "installers" ]; then
+            echo "Directory exists."
+          else
+            echo "Error: 'installers' directory does not exist!"
+            exit 1
+          fi
+
           echo "Listing files in installers directory:"
           ls -lah installers
 
-      - name: Install SnowSQL
-        run: |
-          sudo apt update
-          sudo apt install -y unzip curl
-
-          # Verify working directory
-          pwd
-          ls -lah
-
-          # Use the uploaded SnowSQL installer from the repository
-          cp installers/snowsql-linux_x86_64.bash snowsql.bash
-
-          # Debugging information
-          echo "Checking if SnowSQL file is copied properly"
-          ls -lah snowsql.bash
-          file snowsql.bash
-
-          # Install SnowSQL
-          chmod +x snowsql.bash
-          ./snowsql.bash -- -y || { echo "Installation failed"; exit 1; }
-
-          # Ensure SnowSQL is in the PATH
-          echo "export PATH=\$PATH:/usr/local/bin" >> ~/.bashrc
-          echo "export PATH=\$PATH:/usr/local/bin" >> $GITHUB_ENV
-          source ~/.bashrc
-
-          # Verify installation
-          snowsql --version || { echo "SnowSQL installation failed"; exit 1; }
-
-      - name: Test Snowflake Connection
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-        run: |
-          snowsql -a "$SNOWFLAKE_ACCOUNT" \
-                  -u "$SNOWFLAKE_USER" \
-                  -P "$SNOWFLAKE_PASSWORD" \
-                  -d "$SNOWFLAKE_DATABASE" \
-                  -s "$SNOWFLAKE_SCHEMA" \
-                  -w "$SNOWFLAKE_WAREHOUSE" \
-                  -q "SELECT CURRENT_VERSION();" || { echo "Query failed"; exit 2; }
-
-      - name: Execute SQL Script
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-        run: |
-          snowsql -a "$SNOWFLAKE_ACCOUNT" \
-                  -u "$SNOWFLAKE_USER" \
-                  -P "$SNOWFLAKE_PASSWORD" \
-                  -d "$SNOWFLAKE_DATABASE" \
-                  -s "$SNOWFLAKE_SCHEMA" \
-                  -w "$SNOWFLAKE_WAREHOUSE" \
-                  -f code.sql || { echo "SQL script execution failed"; exit 2; }
+          echo "Checking if SnowSQL file is present..."
+          if [ -f "installers/snowsql-linux_x86_64.bash" ]; then
+            echo "SnowSQL file is present."
+            ls -lah installers/snowsql-linux_x86_64.bash
+          else
+            echo "Error: SnowSQL file does not exist in 'installers' directory!"
+            exit 1
+          fi
