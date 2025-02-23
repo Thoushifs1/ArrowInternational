@@ -16,35 +16,35 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y unzip curl
-          
+
           # Verify working directory
           pwd
           ls -lah
-          
-          # Download the latest SnowSQL package from the official Snowflake repo
+
+          # Download the correct SnowSQL package from the official Snowflake repo
           SNOWSQL_URL="https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-linux_x86_64.bash"
           curl -L -o snowsql.bash $SNOWSQL_URL
-          
+
           # Check if the file was downloaded properly
           ls -lah snowsql.bash || { echo "SnowSQL file not found!"; exit 1; }
           file snowsql.bash
-          
+
           # Check if it's a script and not an HTML file
           if grep -q "<html" snowsql.bash; then
             echo "Downloaded file is an HTML page, not the installer. Check URL!"
             cat snowsql.bash
             exit 1
           fi
-          
+
           # Install SnowSQL
           chmod +x snowsql.bash
           ./snowsql.bash -- -y || { echo "Installation failed"; exit 1; }
-          
+
           # Ensure SnowSQL is in the PATH
           echo "export PATH=\$PATH:/usr/local/bin" >> ~/.bashrc
           echo "export PATH=\$PATH:/usr/local/bin" >> $GITHUB_ENV
           source ~/.bashrc
-          
+
           # Verify installation
           snowsql --version || { echo "SnowSQL installation failed"; exit 1; }
 
