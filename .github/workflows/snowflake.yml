@@ -12,16 +12,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install SnowSQL from Snowflake Repository
+      - name: Debug SnowSQL Download
         run: |
-          sudo apt update
-          sudo apt install -y unzip curl
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.23-linux_x86_64.bash
+          ls -lah
+          file snowsql-1.2.23-linux_x86_64.bash || echo "SnowSQL file not found"
+          head -n 20 snowsql-1.2.23-linux_x86_64.bash || echo "Cannot read SnowSQL file"
+
+      - name: Verify SnowSQL Installation
+        run: |
           chmod +x snowsql-1.2.23-linux_x86_64.bash
-          ./snowsql-1.2.23-linux_x86_64.bash -- -y
-          echo "export PATH=$PATH:/usr/bin" >> ~/.bashrc
-          source ~/.bashrc
-          snowsql --version
+          ./snowsql-1.2.23-linux_x86_64.bash --quiet -- -y || { echo "Installation failed"; exit 1; }
+
+      - name: Validate SnowSQL Path
+        run: |
+          which snowsql || { echo "SnowSQL not found in PATH"; exit 1; }
+          snowsql --version || { echo "SnowSQL execution failed"; exit 1; }
 
       - name: Test Snowflake Connection
         env:
