@@ -21,16 +21,12 @@ jobs:
           pwd
           ls -lah
 
-          # Download the correct SnowSQL package from the official Snowflake repo
+          # Correct SnowSQL package URL from Snowflake's official documentation
           SNOWSQL_URL="https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-linux_x86_64.bash"
           curl -L -o snowsql.bash $SNOWSQL_URL
 
           # Check if the file was downloaded properly
-          if ! [ -f snowsql.bash ]; then
-            echo "SnowSQL file not found!"
-            exit 1
-          fi
-
+          ls -lah snowsql.bash || { echo "SnowSQL file not found!"; exit 1; }
           file snowsql.bash
 
           # Check if it's a script and not an HTML file
