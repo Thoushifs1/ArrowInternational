@@ -26,7 +26,11 @@ jobs:
           curl -L -o snowsql.bash $SNOWSQL_URL
 
           # Check if the file was downloaded properly
-          ls -lah snowsql.bash || { echo "SnowSQL file not found!"; exit 1; }
+          if ! [ -f snowsql.bash ]; then
+            echo "SnowSQL file not found!"
+            exit 1
+          fi
+
           file snowsql.bash
 
           # Check if it's a script and not an HTML file
