@@ -1,4 +1,4 @@
-name: Deploy to Snowflake
+name: Debug SnowSQL Installation
 
 on:
   push:
@@ -6,30 +6,45 @@ on:
       - main
 
 jobs:
-  deploy:
+  debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Build Docker Image
+      - name: Install SnowSQL
         run: |
-          docker build -t snowsql-deploy .
+          sudo apt update
+          sudo apt install -y unzip curl
 
-      - name: Run Docker Container
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-        run: |
-          docker run --rm \
-            -e SNOWFLAKE_ACCOUNT="${SNOWFLAKE_ACCOUNT}" \
-            -e SNOWFLAKE_USER="${SNOWFLAKE_USER}" \
-            -e SNOWFLAKE_PASSWORD="${SNOWFLAKE_PASSWORD}" \
-            -e SNOWFLAKE_DATABASE="${SNOWFLAKE_DATABASE}" \
-            -e SNOWFLAKE_SCHEMA="${SNOWFLAKE_SCHEMA}" \
-            -e SNOWFLAKE_WAREHOUSE="${SNOWFLAKE_WAREHOUSE}" \
-            snowsql-deploy
+          # Verify working directory
+          pwd
+          ls -lah
+
+          # Download SnowSQL package from the official Snowflake repo
+          SNOWSQL_URL="https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-linux_x86_64.bash"
+          curl -L -o snowsql.bash $SNOWSQL_URL
+
+          # Debugging information
+          echo "Checking if SnowSQL file is downloaded properly"
+          ls -lah snowsql.bash
+          file snowsql.bash
+
+          # Check if it's a script and not an HTML file
+          if grep -q "<html" snowsql.bash; then
+            echo "Downloaded file is an HTML page, not the installer. Check URL!"
+            cat snowsql.bash
+            exit 1
+          fi
+
+          # Install SnowSQL
+          chmod +x snowsql.bash
+          ./snowsql.bash -- -y || { echo "Installation failed"; exit 1; }
+
+          # Ensure SnowSQL is in the PATH
+          echo "export PATH=\$PATH:/usr/local/bin" >> ~/.bashrc
+          echo "export PATH=\$PATH:/usr/local/bin" >> $GITHUB_ENV
+          source ~/.bashrc
+
+          # Verify installation
+          snowsql --version || { echo "SnowSQL installation failed"; exit 1; }
