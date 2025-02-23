@@ -16,17 +16,26 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y unzip
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-linux_x86_64
-          chmod +x snowsql-linux_x86_64
-          sudo mv snowsql-linux_x86_64 /usr/local/bin/snowsql
-          sudo chmod +x /usr/local/bin/snowsql
-          echo "/usr/local/bin" >> $GITHUB_PATH
+          
+          # Download SnowSQL installation package
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-latest-linux_x86_64.bash
+
+          # Install SnowSQL properly
+          chmod +x snowsql-latest-linux_x86_64.bash
+          ./snowsql-latest-linux_x86_64.bash --quiet -- -y
+
+          # Ensure SnowSQL is in the PATH
+          echo "/usr/bin" >> $GITHUB_PATH
+          echo "export PATH=\$PATH:/usr/bin" >> ~/.bashrc
+          echo "export PATH=\$PATH:/usr/bin" >> ~/.profile
+          source ~/.bashrc
+          source ~/.profile
 
       - name: Verify SnowSQL Installation
         run: |
-          ls -lah /usr/local/bin/snowsql
-          file /usr/local/bin/snowsql
           which snowsql
+          ls -lah /usr/bin/snowsql
+          file /usr/bin/snowsql
           snowsql --version
 
       - name: Debug Environment Variables
