@@ -15,37 +15,21 @@ jobs:
       - name: Install SnowSQL
         run: |
           sudo apt update
-          sudo apt install -y unzip
+          sudo apt install -y unzip wget
           
-          # Download SnowSQL installation package
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/latest/linux_x86_64/snowsql-latest-linux_x86_64.bash
+          # Download SnowSQL using authenticated request
+          wget --content-disposition "https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.23-linux_x86_64.bash"
 
-          # Install SnowSQL properly
-          chmod +x snowsql-latest-linux_x86_64.bash
-          ./snowsql-latest-linux_x86_64.bash --quiet -- -y
+          # Install SnowSQL
+          chmod +x snowsql-1.2.23-linux_x86_64.bash
+          ./snowsql-1.2.23-linux_x86_64.bash --quiet -- -y
 
-          # Ensure SnowSQL is in the PATH
+          # Ensure SnowSQL is in PATH
           echo "/usr/bin" >> $GITHUB_PATH
           echo "export PATH=\$PATH:/usr/bin" >> ~/.bashrc
-          echo "export PATH=\$PATH:/usr/bin" >> ~/.profile
           source ~/.bashrc
-          source ~/.profile
-
-      - name: Verify SnowSQL Installation
-        run: |
           which snowsql
-          ls -lah /usr/bin/snowsql
-          file /usr/bin/snowsql
           snowsql --version
-
-      - name: Debug Environment Variables
-        run: |
-          echo "SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}"
-          echo "SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}"
-          echo "SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}"
-          echo "SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}"
-          echo "SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}"
-        shell: bash
 
       - name: Test Snowflake Connection
         env:
@@ -56,7 +40,6 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
-          snowsql --diag
           snowsql -a "$SNOWFLAKE_ACCOUNT" \
                   -u "$SNOWFLAKE_USER" \
                   -P "$SNOWFLAKE_PASSWORD" \
