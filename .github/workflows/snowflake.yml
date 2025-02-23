@@ -29,6 +29,15 @@ jobs:
           which snowsql
           snowsql --version
 
+      - name: Debug Environment Variables
+        run: |
+          echo "SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}"
+          echo "SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}"
+          echo "SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}"
+          echo "SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}"
+          echo "SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}"
+        shell: bash
+
       - name: Test Snowflake Connection
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
@@ -38,13 +47,14 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
-          snowsql -a $SNOWFLAKE_ACCOUNT \
-                  -u $SNOWFLAKE_USER \
-                  -P $SNOWFLAKE_PASSWORD \
-                  -d $SNOWFLAKE_DATABASE \
-                  -s $SNOWFLAKE_SCHEMA \
-                  -w $SNOWFLAKE_WAREHOUSE \
-                  -q "SELECT 1;"
+          snowsql --diag
+          snowsql -a "$SNOWFLAKE_ACCOUNT" \
+                  -u "$SNOWFLAKE_USER" \
+                  -P "$SNOWFLAKE_PASSWORD" \
+                  -d "$SNOWFLAKE_DATABASE" \
+                  -s "$SNOWFLAKE_SCHEMA" \
+                  -w "$SNOWFLAKE_WAREHOUSE" \
+                  -q "SELECT CURRENT_VERSION();" || { echo "Query failed"; exit 2; }
 
       - name: Execute SQL Script
         env:
@@ -55,10 +65,10 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
-          snowsql -a $SNOWFLAKE_ACCOUNT \
-                  -u $SNOWFLAKE_USER \
-                  -P $SNOWFLAKE_PASSWORD \
-                  -d $SNOWFLAKE_DATABASE \
-                  -s $SNOWFLAKE_SCHEMA \
-                  -w $SNOWFLAKE_WAREHOUSE \
-                  -f code.sql
+          snowsql -a "$SNOWFLAKE_ACCOUNT" \
+                  -u "$SNOWFLAKE_USER" \
+                  -P "$SNOWFLAKE_PASSWORD" \
+                  -d "$SNOWFLAKE_DATABASE" \
+                  -s "$SNOWFLAKE_SCHEMA" \
+                  -w "$SNOWFLAKE_WAREHOUSE" \
+                  -f code.sql || { echo "SQL script execution failed"; exit 2; }
