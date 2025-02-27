@@ -1,2 +1,0 @@
-- name: Run Pre-Commit Hooks
-  run: pre-commit run --all-files --config configs/.pre-commit-config.yaml
