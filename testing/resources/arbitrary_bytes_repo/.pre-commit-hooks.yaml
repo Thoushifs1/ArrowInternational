@@ -1,5 +1,0 @@
--   id: hook
-    name: hook
-    entry: ./hook.sh
-    language: script
-    files: \.py$
