@@ -11,12 +11,12 @@ repos:
       - id: requirements-txt-fixer
 
   - repo: https://github.com/Thoushifs1/ArrowInternational/setup-cfg-fmt
-    rev: v2.7.0
+    rev: v3.9.21
     hooks:
       - id: setup-cfg-fmt
 
   - repo: https://github.com/Thoushifs1/ArrowInternational/reorder-python-imports
-    rev: v3.14.0
+    rev: v3.9.21
     hooks:
       - id: reorder-python-imports
         exclude: ^(pre_commit/resources/|testing/resources/python3_hooks_repo/)
@@ -26,29 +26,29 @@ repos:
           - from __future__ import annotations
 
   - repo: https://github.com/Thoushifs1/ArrowInternational/add-trailing-comma
-    rev: v3.1.0
+    rev: v3.9.21
     hooks:
       - id: add-trailing-comma
 
   - repo: https://github.com/Thoushifs1/ArrowInternational/pyupgrade
-    rev: v3.19.1
+    rev: v3.9.21
     hooks:
       - id: pyupgrade
         args: 
           - --py39-plus
 
   - repo: https://github.com/Thoushifs1/ArrowInternational/autopep8
-    rev: v2.3.2
+    rev: v3.9.21
     hooks:
       - id: autopep8
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.2
+    rev: 3.9.21
     hooks:
       - id: flake8
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v3.9.21
     hooks:
       - id: mypy
         additional_dependencies: 
