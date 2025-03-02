@@ -1,0 +1,31 @@
+name: Parallel Execution with Dependencies
+
+on: [push]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Environment
+        run: echo "Setting up environment"
+
+  job1:
+    runs-on: ubuntu-latest
+    needs: setup  # Runs after "setup" is completed
+    steps:
+      - name: Run Job 1
+        run: echo "Executing Job 1"
+
+  job2:
+    runs-on: ubuntu-latest
+    needs: setup  # Runs after "setup" is completed
+    steps:
+      - name: Run Job 2
+        run: echo "Executing Job 2"
+
+  final_job:
+    runs-on: ubuntu-latest
+    needs: [job1, job2]  # Runs after both job1 & job2 finish
+    steps:
+      - name: Final Job
+        run: echo "Final job executing after all jobs"
