@@ -1,0 +1,14 @@
+my_snowflake_profile:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "app.snowflake.com/fuufpgc/lz36572/"
+      user: "SHAIKAHAMMAD"
+      password: "ThoushifAhammad@123"
+      role: "ACCOUNTADMIN"
+      database: "ARROW_INTERNATIONAL"
+      warehouse: "COMPUTE_WH"
+      schema: "PUBLIC"
+      threads: 4
+      client_session_keep_alive: False
