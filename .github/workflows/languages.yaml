@@ -2,7 +2,7 @@ name: languages
 
 on:
   push:
-    branches: [main, test-me-*]
+    branches: 
     tags: '*'
   pull_request:
 
