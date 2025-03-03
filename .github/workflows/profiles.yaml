@@ -1,5 +1,5 @@
 default:
-  target: dev
+  target: main
   outputs:
     dev:
       type: snowflake
