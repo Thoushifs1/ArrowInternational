@@ -1,0 +1,12 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: LZ36572
+      user: SHAIKAHAMMAD
+      role: ACCOUNTADMIN
+      database: ARROW_INTRNATIONAL
+      warehouse: COMPUTE_WH
+      schema: TEST
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
