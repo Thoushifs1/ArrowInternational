@@ -1,7 +1,6 @@
 your_profile:
   target: Feauture
   outputs:
-    dev:
       type: snowflake
       account: "LZ36572"
       user: "SHAIKAHAMMAD"
