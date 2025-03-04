@@ -2,5 +2,5 @@ SELECT
     first_name,
     last_name,
     department
-FROM employees123
+FROM employees@#$yu
 WHERE department = 'Sales';
