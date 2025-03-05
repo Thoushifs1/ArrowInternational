@@ -8,7 +8,7 @@ on:
 
 jobs:
   pre-commit:
-    name: Thoushif Pre-Commit Checks
+    name: thoushif Pre-Commit Checks
     runs-on: ubuntu-latest
 
     steps:
