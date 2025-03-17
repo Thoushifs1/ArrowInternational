@@ -9,4 +9,4 @@ your_profile:
       database: "ARROW_INTRNATIONAL"
       warehouse: "COMPUTE_WH"
       schema: "TEST"
-      password: "ThoushifAhammad@123"
+      SNOWFLAKE_PRIVATE_KEY: "SNOWFLAKE_PRIVATE_KEY"
